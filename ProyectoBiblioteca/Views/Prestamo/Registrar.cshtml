@@ -1,0 +1,504 @@
+﻿@{
+    ViewBag.Title = "Registrar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    table.dataTable tbody td {
+        padding: 5px !important;
+    }
+</style>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 bg-primary">
+        <h6 class="m-0 font-weight-bold text-white">Registrar Préstamo</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Detalle del Lector</h5>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Código:</span>
+                                    </div>
+                                    <input type="hidden" id="hdidlector" value="0" />
+                                    <input type="text" class="form-control" style="background-color: #F9F9F9" disabled="disabled" id="txtcodigopersona">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-secondary" id="btnbuscarlector" type="button">Buscar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Nombres:</span>
+                                    </div>
+                                    <input type="text" class="form-control" disabled="disabled" style="background-color: #F9F9F9" id="txtnombrespersona">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Detalle del Préstamo</h5>
+                        <div class="row">
+                            <div class="col-12">
+
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Libro(s):</span>
+                                    </div>
+                                    <input type="hidden" id="hdidlibro0" value="0" />
+                                    <input type="hidden" id="hdidlibro1" value="0" />
+                                    <input type="hidden" id="hdidlibro2" value="0" />
+                                    <input type="hidden" id="hdtitulolibro0" value="" />
+                                    <input type="hidden" id="hdtitulolibro1" value="" />
+                                    <input type="hidden" id="hdtitulolibro2" value="" />
+                                    <select class="form-control" id="txttitulolibro"></select>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-secondary" id="btnbuscarlibro" type="button">Buscar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Fecha Devolución:</span>
+                                    </div>
+                                    <input type="text" class="form-control" id="txtfechadevolucion" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12 text-center">
+                <button id="btnregistrar" class="btn btn-success w-25">Registrar</button>
+                <button class="btn btn-danger w-25 ml-4" disabled id="btncancelarregistro">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="registromodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Terminar Registro</h5>
+                <button id="closeRegistro" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="message-text" class="col-form-label" id="lblestado0"></label>
+                    <textarea class="form-control" id="txtestadolibro0" maxlength="100" hidden></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="message-text" class="col-form-label" id="lblestado1"></label>
+                    <textarea class="form-control" id="txtestadolibro1" maxlength="100" hidden></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="message-text" class="col-form-label" id="lblestado2"></label>
+                    <textarea class="form-control" id="txtestadolibro2" maxlength="100" hidden></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="volverRegistro" type="button" class="btn btn-danger" data-dismiss="modal">Volver</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarRegistro">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="lectoresmodal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Lista de Lectores</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="tablalector" style="width:100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Codigo</th>
+                                        <th>Nombre</th>
+                                        <th>Apellido</th>
+                                        <th>Correo</th>
+                                        <th>Carrera</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+</div>
+
+<div id="librosmodal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Lista de Libros</h5>
+                <button type="button" id="closeLibros" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="tablalibros" style="width:100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Titulo</th>
+                                        <th>Autor</th>
+                                        <th>Categoria</th>
+                                        <th>Ejemplar</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="volverLibros" class="btn btn-danger" data-dismiss="modal">Volver</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarLibros">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+   <script>
+       var tablalector;
+       var tablalibro;
+       $(document).ready(function () {
+           tablalector = $('#tablalector').DataTable({
+               responsive: true,
+               "ajax": {
+                   "url": '@Url.Action("ListarLector", "Biblioteca")',
+                   "type": "GET",
+                   "datatype": "json",
+                   "dataSrc": function (json) {
+
+                       return json.data.filter(function (item) {
+                           return item.oTipoPersona.IdTipoPersona == 3;
+                       });
+                   }
+               },
+               "columns": [
+                    {
+                        "data": "IdPersona", "render": function (data, type, row, meta) {
+                    
+                            return $("<button>").addClass("btn btn-primary btn-select-lector btn-sm").append(
+                                $("<i>").addClass("fas fa-check")
+                            ).attr({ "data-informacion": JSON.stringify(row) })[0].outerHTML
+                    
+                        },
+                        "orderable": false,
+                        "searchable": false,
+                        "width": "90px"
+                    },
+                    { "data": "Codigo" },
+                    { "data": "Nombre" },
+                    { "data": "Apellido" },
+                   { "data": "Correo" },
+                   { "data": "Carrera" }
+                ],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+           });
+
+           tablalibro = $('#tablalibros').DataTable({
+                responsive:true,
+                "ajax": {
+                    "url": '@Url.Action("ListarLibroActivo", "Biblioteca")',
+                    "type": "GET",
+                    "datatype": "json"
+                },
+               "columns": [
+                    {
+                        "data": "IdLibro", "render": function (data, type, row, meta) {
+
+                            return $("<input>").attr('type', 'checkbox').attr('name', 'cb' + data)
+                                .attr({ "data-informacion": JSON.stringify(row) })[0].outerHTML
+                    
+                        },
+                        "orderable": false,
+                        "searchable": false,
+                        "width": "90px"
+                    },
+                    { "data": "Titulo" },
+                    {
+                        "data": "oAutor", render: function (data) {
+                            return data.Descripcion
+                        }
+                    },
+                    {
+                        "data": "oCategoria", render: function (data) {
+                            return data.Descripcion
+                        }
+                   },
+                    {
+                       "data": "Ejemplar", render: function (data) {
+                           return data
+                       }
+                   }
+                ],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+            });
+       })
+       $("#closeRegistro").on("click", function () {
+           $('#txtestadolibro0').prop('hidden', true);
+           $('#txtestadolibro1').prop('hidden', true);
+           $('#txtestadolibro2').prop('hidden', true);
+           $("#lblestado0").text("")
+           $("#lblestado1").text("")
+           $("#lblestado2").text("")
+       })
+       $("#volverRegistro").on("click", function () {
+           $('#txtestadolibro0').prop('hidden', true);
+           $('#txtestadolibro1').prop('hidden', true);
+           $('#txtestadolibro2').prop('hidden', true);
+           $("#lblestado0").text("")
+           $("#lblestado1").text("")
+           $("#lblestado2").text("")
+       })
+       $("#volverLibros").on("click", function () {
+           $("#hdidlibro0").val("0")
+           $("#hdidlibro1").val("0")
+           $("#hdidlibro2").val("0")
+           $("#hdtitulolibro0").val("")
+           $("#hdtitulolibro1").val("")
+           $("#hdtitulolibro2").val("")
+           $("#txttitulolibro").empty()
+       })
+       $("#closeLibros").on("click", function () {
+           $("#hdidlibro0").val("0")
+           $("#hdidlibro1").val("0")
+           $("#hdidlibro2").val("0")
+           $("#hdtitulolibro0").val("")
+           $("#hdtitulolibro1").val("")
+           $("#hdtitulolibro2").val("")
+           $("#txttitulolibro").empty()
+       })
+       
+       $("#btnregistrar").on("click", function () {
+           var hiden = $("#hdtitulolibro0").val();
+           var hiden1 = $("#hdtitulolibro1").val();
+           var hiden2 = $("#hdtitulolibro2").val();
+           var hiden3 = $("#hdidlector").val();
+           $("#txtestadolibro").val("");
+           if ((hiden || hiden1 || hiden2) != "" && hiden3 != "0") {
+               if (hiden != "") {
+                   $("#lblestado0").text("Estado del libro: " + hiden);
+                   $('#txtestadolibro0').prop('hidden', false);
+               } if (hiden1 != "") {
+                   $("#lblestado1").text("Estado del libro: " + hiden1);
+                   $('#txtestadolibro1').prop('hidden', false);
+               } if (hiden2 != "") {
+                   $("#lblestado2").text("Estado del libro: " + hiden2);
+                   $('#txtestadolibro2').prop('hidden', false);
+               }
+               $("#registromodal").modal("show")
+           } else {
+               swal("Lo siento", "Hace falta seleccionar algún dato", "warning");
+           }
+       })
+
+       $("#btnGuardarRegistro").on("click", function () {
+           var id1 = $("#hdidlibro0").val()
+           var id2 = $("#hdidlibro1").val()
+           var id3 = $("#hdidlibro2").val()
+           var txt1 = $('#txtestadolibro0').val();
+           var txt2 = $('#txtestadolibro1').val();
+           var txt3 = $('#txtestadolibro2').val();
+           var EstadoEntregado = {txt1, txt2, txt3};
+           var request = {
+               objeto: {
+                   oEstadoPrestamo: { IdEstadoPrestamo: 1 },
+                   oPersona: { IdPersona: $("#hdidlector").val() },
+                   oLibro: [{ IdLibro: id1 }, { IdLibro: id2 }, { IdLibro: id3 }],
+                   TextoFechaDevolucion: $("#txtfechadevolucion").val(),
+                   EstadoEntregado: [{ TextoEstadoEntregado: txt1 }, { TextoEstadoEntregado: txt2 }, { TextoEstadoEntregado: txt3 }],
+               }
+           };
+           
+           jQuery.ajax({
+                url: '@Url.Action("GuardarPrestamos", "Prestamo")',
+                type: "POST",
+                data: JSON.stringify(request),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    if (data.resultado) {
+                        limpiarTodo();
+                        $("#registromodal").modal("hide")
+                        swal("Listo", data.mensaje, "success");
+                    } else {
+                        swal("Lo sentimos", data.mensaje, "warning");
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+       })
+
+       $("#btnbuscarlector").on("click", function () {
+           tablalector.ajax.reload();
+           $("#lectoresmodal").modal("show");
+           cargarFecha()
+       })
+       $("#btnbuscarlibro").on("click", function () {
+           $("#hdidlibro0").val("0")
+           $("#hdidlibro1").val("0")
+           $("#hdidlibro2").val("0")
+           $("#hdtitulolibro0").val("")
+           $("#hdtitulolibro1").val("")
+           $("#hdtitulolibro2").val("")
+           $("#txttitulolibro").empty()
+           tablalibro.ajax.reload();
+           $("#librosmodal").modal("show")
+           
+       })
+       $("#btnGuardarLibros").on("click", function () {
+           var hiden = $("#hdtitulolibro0").val();
+           var hiden1 = $("#hdtitulolibro1").val();
+           var hiden2 = $("#hdtitulolibro2").val();
+           if (hiden != "") {
+               $("<option>").attr({ "value": "" }).text(hiden).appendTo("#txttitulolibro");
+           } if (hiden1 != "") {
+               $("<option>").attr({ "value": "" }).text(hiden1).appendTo("#txttitulolibro");
+           } if (hiden2 != "") {
+               $("<option>").attr({ "value": "" }).text(hiden2).appendTo("#txttitulolibro");
+           }
+           $("#librosmodal").modal("hide")
+       })
+       $(document).on('click', '.btn-select-lector', function (event) {
+           var json = $(this).data("informacion")
+           $("#hdidlector").val(json.IdPersona)
+           $("#txtcodigopersona").val(json.Codigo)
+           $("#txtnombrespersona").val(json.Nombre + ' ' + json.Apellido)
+           $("#lectoresmodal").modal("hide")
+
+           $("#btncancelarregistro").prop("disabled",false)
+       });
+
+       $(document).on('click', 'input:checkbox', function (event) {
+           var hiden1 = $("#hdidlibro0").val();
+           var hiden2 = $("#hdidlibro1").val();
+           var hiden3 = $("#hdidlibro2").val();
+           var hiden4 = $("#hdtitulolibro0").val();
+           var hiden5 = $("#hdtitulolibro1").val();
+           var hiden6 = $("#hdtitulolibro2").val();
+           var json = $(this).data("informacion")
+           if ($(this).is(':checked')) {
+               if (hiden1 != "0" && hiden2 != "0" && hiden3 != "0") {
+                   swal("Lo sentimos", "Solo se pueden seleccionar hasta 3 libros", "warning");
+                   /// Desmarcamos el ultimo elemento
+                   $(this).prop('checked', false);
+               } else {
+                   if (hiden1 == "0") {
+                       $("#hdidlibro0").val(json.IdLibro);
+                       $("#hdtitulolibro0").val(json.Titulo);
+                   } else if (hiden2 == "0") {
+                       $("#hdidlibro1").val(json.IdLibro);
+                       $("#hdtitulolibro1").val(json.Titulo);
+                   } else if (hiden3 == "0") {
+                       $("#hdidlibro2").val(json.IdLibro);
+                       $("#hdtitulolibro2").val(json.Titulo);
+                   }
+               }
+               } else {
+                   if (hiden1 == json.IdLibro && hiden4 == json.Titulo) {
+                       $("#hdidlibro0").val("0");
+                       $("#hdtitulolibro0").val("");
+                   } else if (hiden2 == json.IdLibro && hiden5 == json.Titulo) {
+                       $("#hdidlibro1").val("0");
+                       $("#hdtitulolibro1").val("");
+                   } else if (hiden3 == json.IdLibro && hiden6 == json.Titulo) {
+                       $("#hdidlibro2").val("0");
+                       $("#hdtitulolibro2").val("");
+                   }
+               }
+       });
+       $("#btncancelarregistro").on("click", function () {
+           limpiarTodo();
+       })
+
+       function limpiarTodo() {
+           $("#hdidlector").val("0")
+           $("#txtcodigopersona").val("")
+           $("#txtnombrespersona").val("")
+
+           $("#hdidlibro0").val("0")
+           $("#hdidlibro1").val("0")
+           $("#hdidlibro2").val("0")
+           $("#hdtitulolibro0").val("")
+           $("#hdtitulolibro1").val("")
+           $("#hdtitulolibro2").val("")
+           $("#txttitulolibro").val("")
+           $('#txtestadolibro0').prop('hidden', true);
+           $('#txtestadolibro1').prop('hidden', true);
+           $('#txtestadolibro2').prop('hidden', true);
+           $("#lblestado0").text("")
+           $("#lblestado1").text("")
+           $("#lblestado2").text("")
+           $("#txttitulolibro").empty()
+           $("#txtfechadevolucion").val("")
+
+           $("#btncancelarregistro").prop("disabled", true)
+
+       }
+       function cargarFecha() {
+           var fecha = diasHabiles();
+           $("#txtfechadevolucion").val(fecha);
+       }
+       function diasHabiles() {
+           hoy = new Date();
+           i = 0;
+           while (i < 5) {
+               hoy.setTime(hoy.getTime() + 24 * 60 * 60 * 1000); // añadimos 1 día
+               if (hoy.getDay() != 6 && hoy.getDay() != 0)
+                   i++;
+           }
+           var month = hoy.getMonth() + 1;
+           var month = month > 9 ? month : "0" + month;
+           fecha = hoy.getDate() + '/' + month + '/' + hoy.getFullYear();
+           return fecha; 
+       }
+
+    </script>
+}
